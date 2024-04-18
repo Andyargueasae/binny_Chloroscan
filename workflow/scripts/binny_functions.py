@@ -1043,7 +1043,7 @@ def binny_iterate(contig_data_df, threads, marker_sets_graph, tigrfam2pfam_data_
 def get_single_contig_bins(essential_gene_df, good_bins_dict, n_dims, marker_sets_graph, tigrfam2pfam_data_dict,
                            threads=1, max_marker_lineage_depth_lvl=4):
     essential_gene_lol = essential_gene_df.values.tolist()
-    cluster_list = [[i[0], i[1].split(',')] for i in essential_gene_lol if len(set(i[1].split(','))) >= 40]
+    cluster_list = [[i[0], i[1].split(',')] for i in essential_gene_lol if len(set(i[1].split(','))) >= 30]
     cluster_list.sort(key=lambda i: i[1], reverse=True)
     start = timer()
     chunks_to_process = [[] for i in range(threads)]
@@ -1108,7 +1108,7 @@ def load_checkm_markers(marker_file):
         # next(f)
         for line in f:
             line = line.strip('\n \t').split('\t')
-            if (int(line[5]) < 58
+            if (int(line[5]) < 1
                     or 'Tenericutes' in line[2]
                     or 'Haemophilus' in line[2]
                     # or 'Enterobacteriales' in line[2]
@@ -1130,7 +1130,7 @@ def load_checkm_markers(marker_file):
             if len(lineage) == 7:
                 lineage[-1] = ' '.join(lineage[-2:])
 
-            if len(marker_sets) >= 10:
+            if len(marker_sets) >= 1:
                 tms_data.add_nodes_from(lineage)
                 tms_data.add_edges_from([(i, lineage[index + 1]) for index, i in enumerate(lineage)
                                          if not index + 1 == len(lineage)])
@@ -1149,6 +1149,7 @@ def load_checkm_markers(marker_file):
                             logging.warning(lineage)
                             logging.warning(tms_data.nodes[lineage[-1]])
                             raise KeyError
+    # tms_data is all empty, so here is the problem again.
     return tms_data
 
 
@@ -1352,19 +1353,26 @@ def load_depth_dict(mg_depth_file):
 
 def parse_mantis_cons_annot(mantis_out_annot):
     mantis_data = {}
+
     with open(mantis_out_annot, 'r') as f:
         next(f)
         for line in f:
             line = line.strip('\n \t').split('\t')
-            gene, markers = line[0], [marker.split(':')[-1] for marker in line[6:] if
-                                      not marker.split(':')[-1].startswith('DUF')]
+            if line[6:] != []:
+                gene, markers = line[0], [marker.split(':')[-1] for marker in line[6:] if
+                                  not marker.split(':')[-1].startswith('DUF')]
+            else:
+                gene, markers = line[0], [line[2]]
             mantis_data[gene] = markers
     return mantis_data
 
 
 def checkm_hmmer_search2prokka_gff(hmm_checkm_marker_out, prokka_gff, gff_out_path='intermediary'):
     prokka_checkm_gff = '{0}/annotation_CDS_RNA_hmms_checkm.gff'.format(gff_out_path)
+    # This one is empty.
     checkm_marker_dict = parse_mantis_cons_annot(hmm_checkm_marker_out)
+    
+    # breakpoint()
     with open(prokka_checkm_gff, 'w') as pcg:
         with open(prokka_gff, 'r') as pg:
             for line in pg:
