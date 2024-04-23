@@ -220,9 +220,9 @@ rule prepare_input_data:
         else [os.path.join(OUTPUTDIR, "intermediary/reads_{0}_sorted.bam".format(sample_id_map_dict[mappings_id]))
               for mappings_id in mappings_ids]
     threads: 1 
-#    resources:
-#        runtime = "4:00:00",
-#        mem = MEMCORE
+    resources:
+       runtime = "4h",
+       mem = MEMCORE
     message:
         "Preparing input."
     run:
@@ -238,7 +238,7 @@ rule format_assembly:
     threads: 
         getThreads(1)
     resources:
-        runtime = "2:00:00",
+        runtime = "2h",
         mem = MEMCORE
     message:
         "Preparing assembly."
@@ -261,7 +261,7 @@ if not CONTIG_DEPTH:
         output:
             os.path.join(OUTPUTDIR, "intermediary/assembly_contig_depth_{sample}.txt")
         resources:
-            runtime = "4:00:00",
+            runtime = "4h",
             mem = BIGMEMCORE if BIGMEMCORE else MEMCORE
         threads:
             1
@@ -295,7 +295,7 @@ if not CONTIG_DEPTH:
         params:
             int_dir=os.path.join(OUTPUTDIR, "intermediary")
         resources:
-            runtime = "1:00:00",
+            runtime = "1h",
             mem = MEMCORE
         threads:
             getThreads(1)
@@ -337,7 +337,7 @@ rule annotate:
     threads:
         getThreads(24)
     resources:
-        runtime = "48:00:00",
+        runtime = "2d",
         mem = MEMCORE
     log:
         os.path.join(OUTPUTDIR, "logs/analysis_annotate.log")
@@ -376,7 +376,7 @@ rule mantis_checkm_marker_sets:
     params:
         binny_cfg=srcdir("config/binny_mantis.cfg")
     resources:
-        runtime = "48:00:00",
+        runtime = "2d",
         mem = MEMCORE
     conda:
         MANTIS_ENV if MANTIS_ENV else os.path.join(ENVDIR, "mantis.yaml")
@@ -437,7 +437,7 @@ rule binny:
         hdbscan_epsilon_range=config["clustering"]["hdbscan_epsilon_range"],
         write_contig_data=config["write_contig_data"]
     resources:
-        runtime = "12:00:00",
+        runtime = "12h",
         mem = BIGMEMCORE if BIGMEMCORE else MEMCORE
     threads:
         getThreads(BIGMEMS) if BIGMEMCORE else getThreads(80)
