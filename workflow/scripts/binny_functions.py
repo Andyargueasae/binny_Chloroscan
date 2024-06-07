@@ -270,7 +270,7 @@ def cluster_df_from_dict(cluster_dict):
             except ValueError:
                 logging.warning(metric_uniq_list, metric, cluster_df, cluster_dict)
                 raise Exception
-    return cluster_df.fillna(0)
+    return cluster_df.fillna('0')
 
 
 def cluster_dict2bin_dict(cluster_dict, cluster_df):
