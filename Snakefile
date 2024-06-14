@@ -390,7 +390,11 @@ rule mantis_checkm_marker_sets:
         "MANTIS: Running MANTIS with CheckM marker sets."
     shell:
         """
+        # do we need to setup and check it here?
         if [ -d {output.out_dir} ]; then rm {output.out_dir}/* || true ; fi >> {log} 2>&1
+
+        mantis setup -mc {params.binny_cfg} --no_taxonomy
+        mantis check -mc {params.binny_cfg} --no_taxonomy
         mantis run -i {input.proteins} \
                    -da heuristic \
                    -mc {params.binny_cfg} \
