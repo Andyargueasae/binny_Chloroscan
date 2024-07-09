@@ -47,7 +47,7 @@ def gff2ess_gene_df(annotation_file, target_attribute='essential', get_dict=Fals
                 continue
             # Only add line if feature was annotated as essential gene
             for attribute in attributes:
-                attribute_name, attribute_id = attribute.split('=')[0], attribute.split('=')[1]
+                attribute_name, attribute_id = attribute.split('=')[0], attribute.split('=')[-1]
                 if attribute_name == target_attribute and attribute_id:
                     if not contig_dict.get(contig):
                         if target_attribute == 'essential':
@@ -821,7 +821,7 @@ def gff2low_comp_feature_dict(annotation_file):
                 continue
             # Only add line if feature was annotated as essential gene
             for attribute in attributes:
-                attribute_name, attribute_id = attribute.split('=')[0], attribute.split('=')[1]
+                attribute_name, attribute_id = attribute.split('=')[0], attribute.split('=')[-1]
                 if attribute_name == 'product' and 'ribosomal RNA' in attribute_id:
                     if not contig_dict.get(contig):
                         contig_dict[contig] = [(int(feature_start), int(feature_end))]
@@ -832,6 +832,7 @@ def gff2low_comp_feature_dict(annotation_file):
                         contig_dict[contig] = [(int(feature_start), int(feature_end))]
                     else:
                         contig_dict[contig].append((int(feature_start), int(feature_end)))
+                
     return contig_dict
 
 
