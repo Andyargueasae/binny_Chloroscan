@@ -821,6 +821,7 @@ def gff2low_comp_feature_dict(annotation_file):
                 continue
             # Only add line if feature was annotated as essential gene
             for attribute in attributes:
+                # Here, due to mantis predicting more than one marker under one ORF, the attribute id will be the end of list. 
                 attribute_name, attribute_id = attribute.split('=')[0], attribute.split('=')[-1]
                 if attribute_name == 'product' and 'ribosomal RNA' in attribute_id:
                     if not contig_dict.get(contig):
