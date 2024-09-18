@@ -4,4 +4,4 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - prokka=1.14.6
+  - prokka=1.14.5
