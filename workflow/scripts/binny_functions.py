@@ -1077,7 +1077,7 @@ def asses_contig_completeness_purity(essential_gene_lol, n_dims, marker_sets_gra
         marker_set = choose_checkm_marker_set(all_ess, marker_sets_graph, tigrfam2pfam_data_dict,
                                               max_depth_lvl=max_marker_lineage_depth_lvl)
         taxon, comp, pur = marker_set[0], marker_set[1], marker_set[2]
-        if pur > 0.90 and comp > 0.90:
+        if pur > 0.90 and comp > 0.85: #If too low, may overlook its small components.
             bin_dict = {contig_data[0]: {'depth1': np.array([None]), 'contigs': np.array([contig_data[0]]),
                                          'essential': np.array(all_ess), 'purity': pur, 'completeness': comp,
                                          'taxon': taxon}}
