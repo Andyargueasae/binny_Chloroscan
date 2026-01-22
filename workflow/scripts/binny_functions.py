@@ -1110,12 +1110,13 @@ def load_checkm_markers(marker_file):
         # next(f)
         for line in f:
             line = line.strip('\n \t').split('\t')
-            if (int(line[5]) < 1
+            if (int(line[5]) < 5
                     or 'Tenericutes' in line[2]
                     or 'Haemophilus' in line[2]
                     # or 'Enterobacteriales' in line[2]
                     or 'Rickettsiales' in line[2]
-                    or 'Chlamydiae' in line[2]):
+                    or 'Chlamydiae' in line[2]
+                    or 'Euglenozoa' in line[2]):
                 logging.debug('Skipping loading of markers from {0}.'.format(line[1]))
                 continue
             # marker_sets = line[-1].replace(']), set([', ';')
