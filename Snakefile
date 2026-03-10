@@ -6,8 +6,6 @@ import shutil
 import sys
 import tarfile
 import urllib.request
-
-import pandas as pd
 import yaml
 
 
@@ -151,34 +149,34 @@ if SAMPLE == "":
 SAMPLE = re.sub("_+","_",re.sub("[;|.-]","_",SAMPLE))
 
 
-#set up DBs, if necessary
-if not config['db_path']:
-    DBPATH = srcdir('database')
-else:
-    DBPATH = os.path.expandvars(config['db_path'])
-    if not os.path.isabs(DBPATH):
-        DBPATH = os.path.join(os.getcwd(), DBPATH)
-if not os.path.exists(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv")):
-    print("Setting up marker database")
-    if not os.path.exists(DBPATH):
-        os.makedirs(DBPATH)
-    if not os.path.exists(os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz")):	
-        urllib.request.urlretrieve("https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz", os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz"))
-    checkm_tar = tarfile.open(os.path.join( DBPATH, "checkm_data_2015_01_16.tar.gz"))
-    checkm_tar.extract("./taxon_marker_sets.tsv",DBPATH)
-    checkm_tar.extract("./pfam/tigrfam2pfam.tsv",DBPATH)
-    checkm_tar.extract("./hmms/checkm.hmm",DBPATH)
-    markers_df = pd.read_csv(os.path.join(DBPATH, 'taxon_marker_sets.tsv'), sep='\t', skipinitialspace=True, header=None)
-    markers_df = markers_df.sort_values(markers_df.columns[2])
-    markers_df.to_csv(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv"), header=None, index=None, sep="\t")
-    prepCheckM.remove_unused_checkm_hmm_profiles(os.path.join(DBPATH, "hmms/checkm.hmm"), os.path.join(DBPATH, 'taxon_marker_sets.tsv'), os.path.join(DBPATH, "pfam/tigrfam2pfam.tsv"), os.path.join(DBPATH, "hmms"))
-    if os.path.exists(os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz")):
-        os.remove(os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz"))
-    if os.path.exists(os.path.join(DBPATH, "hmms/checkm.hmm")):
-        os.remove(os.path.join(DBPATH, "hmms/checkm.hmm"))
-    if os.path.exists(os.path.join(DBPATH, "taxon_marker_sets.tsv")) and os.path.exists(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv")):
-        os.remove(os.path.join(DBPATH, "taxon_marker_sets.tsv"))
-    print("Initializing conda environments.")
+# #set up DBs, if necessary
+# if not config['db_path']:
+#     DBPATH = srcdir('database')
+# else:
+#     DBPATH = os.path.expandvars(config['db_path'])
+#     if not os.path.isabs(DBPATH):
+#         DBPATH = os.path.join(os.getcwd(), DBPATH)
+# if not os.path.exists(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv")):
+#     print("Setting up marker database")
+#     if not os.path.exists(DBPATH):
+#         os.makedirs(DBPATH)
+#     if not os.path.exists(os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz")):	
+#         urllib.request.urlretrieve("https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz", os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz"))
+#     checkm_tar = tarfile.open(os.path.join( DBPATH, "checkm_data_2015_01_16.tar.gz"))
+#     checkm_tar.extract("./taxon_marker_sets.tsv",DBPATH)
+#     checkm_tar.extract("./pfam/tigrfam2pfam.tsv",DBPATH)
+#     checkm_tar.extract("./hmms/checkm.hmm",DBPATH)
+#     markers_df = pd.read_csv(os.path.join(DBPATH, 'taxon_marker_sets.tsv'), sep='\t', skipinitialspace=True, header=None)
+#     markers_df = markers_df.sort_values(markers_df.columns[2])
+#     markers_df.to_csv(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv"), header=None, index=None, sep="\t")
+#     prepCheckM.remove_unused_checkm_hmm_profiles(os.path.join(DBPATH, "hmms/checkm.hmm"), os.path.join(DBPATH, 'taxon_marker_sets.tsv'), os.path.join(DBPATH, "pfam/tigrfam2pfam.tsv"), os.path.join(DBPATH, "hmms"))
+#     if os.path.exists(os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz")):
+#         os.remove(os.path.join(DBPATH, "checkm_data_2015_01_16.tar.gz"))
+#     if os.path.exists(os.path.join(DBPATH, "hmms/checkm.hmm")):
+#         os.remove(os.path.join(DBPATH, "hmms/checkm.hmm"))
+#     if os.path.exists(os.path.join(DBPATH, "taxon_marker_sets.tsv")) and os.path.exists(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv")):
+#         os.remove(os.path.join(DBPATH, "taxon_marker_sets.tsv"))
+#     print("Initializing conda environments.")
 
 # temporary directory will be stored inside the OUTPUTDIR directory
 # unless an absolute path is set
