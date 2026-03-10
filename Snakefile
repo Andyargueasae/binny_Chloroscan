@@ -149,13 +149,13 @@ if SAMPLE == "":
 SAMPLE = re.sub("_+","_",re.sub("[;|.-]","_",SAMPLE))
 
 
-# #set up DBs, if necessary
-# if not config['db_path']:
-#     DBPATH = srcdir('database')
-# else:
-#     DBPATH = os.path.expandvars(config['db_path'])
-#     if not os.path.isabs(DBPATH):
-#         DBPATH = os.path.join(os.getcwd(), DBPATH)
+#set up DBs, if necessary
+if not config['db_path']:
+    DBPATH = srcdir('database')
+else:
+    DBPATH = os.path.expandvars(config['db_path'])
+    if not os.path.isabs(DBPATH):
+        DBPATH = os.path.join(os.getcwd(), DBPATH)
 # if not os.path.exists(os.path.join(DBPATH, "taxon_marker_sets_lineage_sorted.tsv")):
 #     print("Setting up marker database")
 #     if not os.path.exists(DBPATH):
