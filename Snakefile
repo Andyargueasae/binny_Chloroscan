@@ -388,6 +388,10 @@ rule mantis_checkm_marker_sets:
         "MANTIS: Running MANTIS with CheckM marker sets."
     shell:
         """
+        which mantis
+        which python
+        python -c "from mantis.__main__ import main"
+        
         # do we need to setup and check it here?
         if [ -d {output.out_dir} ]; then rm {output.out_dir}/* || true ; fi >> {log} 2>&1
 
