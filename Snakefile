@@ -374,51 +374,57 @@ rule mantis_checkm_marker_sets:
     params:
         binny_cfg=srcdir("config/binny_mantis.cfg")
     resources:
-        runtime = "2d",
-        mem = MEMCORE
+        runtime="2d",
+        mem=MEMCORE
     conda:
         MANTIS_ENV if MANTIS_ENV else os.path.join(ENVDIR, "mantis.yaml")
     threads:
         getThreads(80)
-    # log:
-    #     os.path.join(OUTPUTDIR, "logs/analysis_checkm_markers.log")
+    log:
+        os.path.join(OUTPUTDIR, "logs/analysis_checkm_markers.log")
     benchmark:
         os.path.join(OUTPUTDIR, "logs/analysis_checkm_markers_benchmark.txt")
     message:
         "MANTIS: Running MANTIS with CheckM marker sets."
     shell:
-        """
+        r"""
         set -euxo pipefail
 
-        echo "python: $(which python)"
-        echo "mantis: $(which mantis)"
-        python --version
-        head -n 1 "$(which mantis)" || true
+        echo "python: $(which python)" | tee -a {log}
+        echo "mantis: $(which mantis || true)" | tee -a {log}
+        python --version 2>&1 | tee -a {log}
 
-        python - <<'PY'
-        import sys, site
-        print("sys.executable =", sys.executable)
-        print("sys.path =", sys.path)
-        print("sitepackages =", site.getsitepackages())
-        PY
+        if command -v mantis >/dev/null 2>&1; then
+            head -n 1 "$(which mantis)" | tee -a {log}
+        fi
 
-        conda list | grep -E 'mantis|python|numpy|psutil|requests|nltk' || true
+        python - <<'PY' 2>&1 | tee -a {log}
+import sys, site, importlib.util
+print("sys.executable =", sys.executable)
+print("sys.path =", sys.path)
+print("sitepackages =", site.getsitepackages())
+print("mantis spec =", importlib.util.find_spec("mantis"))
+PY
 
-        python -c "import mantis; print(mantis.__file__)"
-        python -c "from mantis.__main__ import main; print(main)"
-        
-        # do we need to setup and check it here?
-        if [ -d {output.out_dir} ]; then rm {output.out_dir}/* || true ; fi >> {log} 2>&1
+        python -m pip show mantis_pfa 2>&1 | tee -a {log} || true
+        python -m pip show mantis 2>&1 | tee -a {log} || true
+        python -m pip list 2>&1 | grep -Ei 'mantis|numpy|psutil|requests|nltk' | tee -a {log} || true
 
-        mantis setup -mc {params.binny_cfg} --no_taxonomy
-        mantis check -mc {params.binny_cfg} --no_taxonomy
+        python -c "import mantis; print(mantis.__file__)" 2>&1 | tee -a {log}
+        python -c "from mantis.__main__ import main; print(main)" 2>&1 | tee -a {log}
+
+        rm -rf {output.out_dir}
+        mkdir -p {output.out_dir}
+
+        mantis setup -mc {params.binny_cfg} --no_taxonomy 2>&1 | tee -a {log}
+        mantis check -mc {params.binny_cfg} --no_taxonomy 2>&1 | tee -a {log}
         mantis run -i {input.proteins} \
                    -da heuristic \
                    -mc {params.binny_cfg} \
                    -o {output.out_dir} \
                    -c {threads} \
                    --no_taxonomy \
-                   -et 1e-3 >> {log} 2>&1
+                   -et 1e-3 2>&1 | tee -a {log}
         """
 
 rule binny:

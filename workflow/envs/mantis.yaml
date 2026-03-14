@@ -6,9 +6,3 @@ channels:
 dependencies:
   - mantis_pfa=1.5.5
   - python=3.10
-  - pip
-  - requests=2.31.0
-  - nltk
-  - pip:
-    - numpy==1.26.4
-    - psutil==5.9.5
