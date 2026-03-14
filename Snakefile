@@ -380,8 +380,8 @@ rule mantis_checkm_marker_sets:
         MANTIS_ENV if MANTIS_ENV else os.path.join(ENVDIR, "mantis.yaml")
     threads:
         getThreads(80)
-    log:
-        os.path.join(OUTPUTDIR, "logs/analysis_checkm_markers.log")
+    # log:
+    #     os.path.join(OUTPUTDIR, "logs/analysis_checkm_markers.log")
     benchmark:
         os.path.join(OUTPUTDIR, "logs/analysis_checkm_markers_benchmark.txt")
     message:
