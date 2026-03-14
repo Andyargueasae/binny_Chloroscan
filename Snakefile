@@ -388,9 +388,24 @@ rule mantis_checkm_marker_sets:
         "MANTIS: Running MANTIS with CheckM marker sets."
     shell:
         """
-        which mantis
-        which python
-        python -c "from mantis.__main__ import main"
+        set -euxo pipefail
+
+        echo "python: $(which python)"
+        echo "mantis: $(which mantis)"
+        python --version
+        head -n 1 "$(which mantis)" || true
+
+        python - <<'PY'
+        import sys, site
+        print("sys.executable =", sys.executable)
+        print("sys.path =", sys.path)
+        print("sitepackages =", site.getsitepackages())
+        PY
+
+        conda list | grep -E 'mantis|python|numpy|psutil|requests|nltk' || true
+
+        python -c "import mantis; print(mantis.__file__)"
+        python -c "from mantis.__main__ import main; print(main)"
         
         # do we need to setup and check it here?
         if [ -d {output.out_dir} ]; then rm {output.out_dir}/* || true ; fi >> {log} 2>&1
